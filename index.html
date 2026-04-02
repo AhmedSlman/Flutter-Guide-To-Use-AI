@@ -228,6 +228,8 @@
   .ph-yellow { background:rgba(234,179,8,.1);   color:#fde047;  border:1px solid rgba(234,179,8,.22); }
   .ph-pink   { background:rgba(236,72,153,.1);  color:#f9a8d4;  border:1px solid rgba(236,72,153,.22); }
   .ph-orange { background:rgba(249,115,22,.1);  color:#fdba74;  border:1px solid rgba(249,115,22,.22); }
+  .ph-purple { background:rgba(168,85,247,.1);  color:#d8b4fe;  border:1px solid rgba(168,85,247,.22); }
+  .ph-red    { background:rgba(239,68,68,.1);   color:#fca5a5;  border:1px solid rgba(239,68,68,.22); }
 
   /* ── PROMPT CARD ── */
   .pc {
@@ -376,33 +378,9 @@
     body { background: #fff; color: #111; }
   }
 
-  @media (max-width: 960px) {
-    .wrap { flex-direction: column; }
-    .sidebar {
-      position: static;
-      width: 100%;
-      max-height: none;
-      border-left: none;
-      border-bottom: 1px solid var(--border);
-      padding: 16px 14px 20px;
-    }
-    .main {
-      margin-right: 0;
-      padding: 18px 14px 80px;
-      max-width: 100%;
-    }
-    .sb-group { display: flex; flex-wrap: wrap; gap: 6px; }
-    .sb-link { flex: 1 1 46%; min-width: 42%; }
-  }
-
   @media (max-width: 768px) {
-    .sidebar { position: static; display: block; }
-    .main { margin-right: 0; padding: 14px 12px 80px; }
-    .cover { padding: 45px 0 24px; }
-    .ps-head-text h2 { font-size: 18px; }
-    .pc-body pre { font-size: 13px; }
-    .sb-group { gap: 4px; }
-    .sb-link { flex: 1 1 100%; min-width: 100%; }
+    .sidebar { display: none; }
+    .main { margin-right: 0; padding: 20px; }
   }
 </style>
 </head>
@@ -452,6 +430,18 @@
   </div>
 
   <div class="sb-group">
+    <div class="sb-group-label">Maintenance Prompts</div>
+    <a class="sb-link" href="#m1">
+      <span class="sb-num" style="background:rgba(168,85,247,.15);color:#d8b4fe;">07</span>
+      تعديل Feature موجودة
+    </a>
+    <a class="sb-link" href="#m2">
+      <span class="sb-num" style="background:rgba(239,68,68,.15);color:#fca5a5;">08</span>
+      Bug Fix / Debug
+    </a>
+  </div>
+
+  <div class="sb-group">
     <div class="sb-group-label">مرجع سريع</div>
     <a class="sb-link" href="#arch">
       <span style="font-size:13px;">🏛️</span> Architecture Cheatsheet
@@ -468,8 +458,8 @@
   <!-- COVER -->
   <div class="cover">
     <div class="cv-tag">⚡ Customized to Your Rules File</div>
-    <h1>Flutter AI Agent<br><span class="grad">Prompt Playbook By Ahmed Slman</span></h1>
-    
+    <h1>Flutter AI Agent<br><span class="grad">Prompt Playbook</span></h1>
+        <h1>By Ahmed Slman</h1>
     <p class="cv-sub">
       برومبتات مظبوطة على معمارية <strong>View → Section → Widget</strong> وكل الـ rules بتاعتك — Cubit, GetIt, ApiResult, Fold pattern, AppColors, Localization.
     </p>
@@ -1353,11 +1343,385 @@ result.fold(
     </div>
   </section>
 
+  <!-- MAINTENANCE DIVIDER -->
+  <div class="back-div" style="margin-top: 8px;">
+    <div class="back-div-line" style="background:linear-gradient(90deg,rgba(168,85,247,.6),transparent)"></div>
+    <div class="back-div-pill" style="background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.25);color:#d8b4fe;">Maintenance Prompts</div>
+    <div class="back-div-line" style="background:linear-gradient(270deg,rgba(168,85,247,.6),transparent)"></div>
+  </div>
+
+  <!-- ══════ M1: MODIFY EXISTING FEATURE ══════ -->
+  <section class="ps" id="m1">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(168,85,247,.1);">✏️</div>
+      <div class="ps-head-text">
+        <h2 style="color:#d8b4fe;">07 — تعديل Feature موجودة</h2>
+        <p>إضافة screen جديدة، تغيير logic، إضافة field، أو تعديل UI على feature خلصت</p>
+      </div>
+    </div>
+
+    <div class="phase ph-purple">Maintenance · عند أي تعديل على feature موجودة</div>
+
+    <div class="note n-warn">
+      <span class="n-icon">⚠️</span>
+      <div><strong>أخطر برومبت في الـ guide</strong> — التعديل على كود موجود ممكن يكسر حاجات تانية. البرومبت ده بيجبر الـ agent يقرأ الكود الحالي كامل أولاً قبل ما يلمس أي حاجة، ويحدد بالظبط إيه اللي هيتغير وإيه اللي هيفضل زي ما هو.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>✏️</span><span class="pct-label">prompt-07-modify-feature.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pm1')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pm1"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 07 — Modify Existing Feature
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">CRITICAL: Read existing code fully before touching anything.</span>
+
+<span class="sec">## Change Request</span>
+<span class="str">Feature:         {{FEATURE_NAME}}</span>
+<span class="str">Feature Folder:  lib/features/{{FEATURE_FOLDER}}/</span>
+<span class="str">Change Type:     {{CHANGE_TYPE}}</span>
+<span class="str">Description:     {{CHANGE_DESCRIPTION}}</span>
+<span class="str">Figma Ref:       {{FIGMA_LAYER_OR_COMPONENT}}  (اتركه فاضي لو مش UI change)</span>
+
+<span class="cmt"># CHANGE_TYPE options:
+# - ADD_SCREEN         → إضافة شاشة جديدة للـ feature
+# - ADD_FIELD          → إضافة field في model أو form
+# - MODIFY_UI          → تعديل تصميم شاشة موجودة
+# - ADD_API_CALL       → إضافة endpoint جديد للـ feature
+# - MODIFY_LOGIC       → تغيير business logic في الـ cubit
+# - ADD_STATE          → إضافة state جديد للـ cubit
+# - REFACTOR           → تحسين كود بدون تغيير سلوك</span>
+
+<span class="sec">### Phase 1 — Read & Understand (لا تكتب كود)</span>
+<span class="op">Before ANY changes, read these files completely:</span>
+
+<span class="hl">1. Feature Structure Scan</span>
+<span class="op">   - List all files inside lib/features/{{FEATURE_FOLDER}}/
+   - Read cubit states — list all existing states and their fields
+   - Read the cubit — list all methods and what they emit
+   - Read the repo interface — list all methods and return types
+   - Read each view — list sections it uses
+   - Read each section — list widgets it renders and states it handles</span>
+
+<span class="hl">2. Impact Analysis</span>
+<span class="op">   Based on {{CHANGE_DESCRIPTION}}, identify:
+   - Files that WILL change
+   - Files that MIGHT be affected (indirect impact)
+   - Files that must NOT change
+   - Shared widgets or core files that could be impacted</span>
+
+<span class="hl">3. Change Plan</span>
+<span class="op">   Output a numbered plan:
+
+   WILL CHANGE:
+     [ ] file_path → what changes and why
+     [ ] file_path → what changes and why
+
+   MIGHT BE AFFECTED:
+     [ ] file_path → why it might need updating
+
+   WILL NOT TOUCH:
+     [ ] file_path → reason
+
+   NEW FILES NEEDED:
+     [ ] file_path → purpose</span>
+
+<span class="imp">⏸ Stop here. Wait for my approval on the plan before writing any code.</span>
+
+<span class="sec">### Phase 2 — Implement (بعد الموافقة)</span>
+
+<span class="hl">For ADD_SCREEN:</span>
+<span class="op">   1. Add new state(s) to existing states file (don't remove old ones)
+   2. Add method(s) to cubit (don't touch existing methods)
+   3. Add repo method + data source method (interface first, then impl)
+   4. Register new route in feature_router.dart
+   5. Create view → sections → widgets following V-S-W pattern
+   6. Update DI if new dependencies needed</span>
+
+<span class="hl">For ADD_FIELD:</span>
+<span class="op">   1. Add field to model (nullable if not required, add to fromJson/toJson/copyWith)
+   2. If state holds the model → state's copyWith handles it automatically
+   3. Update any widget that displays this field (pass as parameter)
+   4. Update section to pass the new field to the widget
+   5. If it's a form field → update validation in core/validation/</span>
+
+<span class="hl">For MODIFY_UI:</span>
+<span class="op">   1. Use Figma MCP to read {{FIGMA_LAYER_OR_COMPONENT}}
+   2. Identify which widget file(s) need changes
+   3. Apply changes ONLY in widget files
+   4. If layout changes → update section's structural arrangement
+   5. Never add styling to sections</span>
+
+<span class="hl">For ADD_API_CALL:</span>
+<span class="op">   1. Add endpoint to ApiEndpoints (if not already there)
+   2. Add method to remote data source
+   3. Add method to repo interface + implementation
+   4. Add use-case-style method in cubit
+   5. Add new states: XxxLoading, XxxSuccess, XxxError
+   6. Wire section to handle the new states</span>
+
+<span class="hl">For MODIFY_LOGIC:</span>
+<span class="op">   1. Read the current cubit method fully
+   2. Understand all states it emits and who listens to them
+   3. Make the minimal change needed
+   4. Ensure all sections that use buildWhen still work correctly
+   5. If state shape changes → update all BlocSelector calls</span>
+
+<span class="hl">For REFACTOR:</span>
+<span class="op">   1. No behavior change — only structure/readability improvement
+   2. Extract widgets if files > 150 lines
+   3. Add buildWhen where missing
+   4. Replace BlocBuilder with BlocSelector for single-field reads
+   5. Add const where missing
+   6. Confirm all tests/screens still work the same</span>
+
+<span class="sec">### Phase 3 — Verify</span>
+<span class="op">After changes, confirm:
+- All states are still handled in every section (no unhandled state)
+- No new violations introduced (see forbidden list)
+- Existing functionality not broken
+- Run dart format .</span>
+
+<span class="sec">### Deliverables</span>
+<span class="var">1. Impact plan [APPROVAL NEEDED]</span>
+<span class="var">2. Changed files only (don't resend unchanged files)</span>
+<span class="var">3. Summary: what changed, what was left untouched, any side effects</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{FEATURE_NAME}}</span><span class="vr-v">PascalCase · مثال: ProductCatalog</span></div>
+      <div class="vr"><span class="vr-k">{{FEATURE_FOLDER}}</span><span class="vr-v">snake_case · مثال: product_catalog</span></div>
+      <div class="vr"><span class="vr-k">{{CHANGE_TYPE}}</span><span class="vr-v">ADD_SCREEN / ADD_FIELD / MODIFY_UI / ADD_API_CALL / MODIFY_LOGIC / ADD_STATE / REFACTOR</span></div>
+      <div class="vr"><span class="vr-k">{{CHANGE_DESCRIPTION}}</span><span class="vr-v">وصف واضح للمطلوب · مثال: "إضافة فلتر بالسعر في شاشة المنتجات — فلتر من-إلى بسيط"</span></div>
+      <div class="vr"><span class="vr-k">{{FIGMA_LAYER_OR_COMPONENT}}</span><span class="vr-v">اسم الـ Layer لو التغيير في الـ UI، اتركه فاضي لو logic فقط</span></div>
+    </div>
+
+    <div class="note n-tip">
+      <span class="n-icon">💡</span>
+      <div>
+        <strong>لو التغيير بسيط جداً</strong> (مثلاً تغيير لون زرار أو نص)، ممكن تختصر الـ Phase 1 وتقول للـ agent مباشرة: <code style="font-family:var(--mono);">"Read only [file_path]. Change only [X]. Nothing else."</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ M2: BUG FIX ══════ -->
+  <section class="ps" id="m2">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(239,68,68,.1);">🐛</div>
+      <div class="ps-head-text">
+        <h2 style="color:#fca5a5;">08 — Bug Fix / Debug</h2>
+        <p>تحليل المشكلة وإصلاحها بدون ما تكسر حاجة تانية</p>
+      </div>
+    </div>
+
+    <div class="phase ph-red">Maintenance · عند ظهور أي bug أو سلوك غير متوقع</div>
+
+    <div class="note n-info">
+      <span class="n-icon">ℹ️</span>
+      <div>البرومبت ده فيه <strong>3 مسارات</strong> — اختار الـ <code style="font-family:var(--mono)">BUG_TYPE</code> المناسب وهيتبع الـ checklist الخاص بيه. ده بيمنع الـ agent من الـ "سيبني هجرب حاجات" approach.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>🐛</span><span class="pct-label">prompt-08-bug-fix.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pm2')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pm2"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 08 — Bug Fix / Debug
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">CRITICAL: Diagnose first, fix second. Never guess.</span>
+
+<span class="sec">## Bug Report</span>
+<span class="str">Feature:          {{FEATURE_NAME}}</span>
+<span class="str">Bug Type:         {{BUG_TYPE}}</span>
+<span class="str">Description:      {{BUG_DESCRIPTION}}</span>
+<span class="str">Steps to Repro:   {{REPRO_STEPS}}</span>
+<span class="str">Expected:         {{EXPECTED_BEHAVIOR}}</span>
+<span class="str">Actual:           {{ACTUAL_BEHAVIOR}}</span>
+<span class="str">Error Message:    {{ERROR_MESSAGE}}</span>
+<span class="str">Affected File(s): {{AFFECTED_FILES}}</span>
+
+<span class="cmt"># BUG_TYPE options:
+# - UI_WRONG        → شاشة بتتعرض غلط / layout بينكسر
+# - STATE_ISSUE     → state مش بيتحدث صح أو rebuild غلط
+# - API_FAILURE     → API call بيفشل أو بيرجع بيانات غلط
+# - NAVIGATION_BUG  → navigation مش شغال أو route غلط
+# - CRASH           → الـ app بيتعطل مع error message
+# - PERF_ISSUE      → الـ UI بطيء أو في jank أو memory leak
+# - DATA_WRONG      → بيانات بتتعرض غلط أو مش بتتحدث</span>
+
+<span class="sec">### Phase 1 — Diagnose (لا تكتب كود)</span>
+
+<span class="hl">Step 1: Read the Error Trail</span>
+<span class="op">If {{ERROR_MESSAGE}} is provided:
+- Parse the stack trace top-down
+- Identify the exact file + line where the error originated
+- Identify if it's a null safety error, type mismatch, or state error</span>
+
+<span class="hl">Step 2: Read Relevant Files</span>
+<span class="op">Based on {{BUG_TYPE}}, read:
+
+UI_WRONG:
+  - The widget file where the issue appears
+  - Its parent section (is it receiving correct data?)
+  - Check: hardcoded values? wrong AppSpacing/AppColors key?
+  - Check Figma MCP if needed to compare with design
+
+STATE_ISSUE:
+  - The cubit file — trace which method emits what state
+  - All sections with BlocBuilder/BlocConsumer for this cubit
+  - Check: is buildWhen filtering out the needed state?
+  - Check: is BlocSelector watching the right field?
+  - Check: is the state being emitted with correct data (copyWith)?
+
+API_FAILURE:
+  - The data source method that calls the API
+  - The ErrorHandler.handleException path taken
+  - The fold() in cubit — is onFailure emitting correctly?
+  - Check: correct ApiEndpoints constant used?
+  - Check: request model toJson() missing a field?
+  - Check: response fromJson() crashing on null?
+
+NAVIGATION_BUG:
+  - Feature router file
+  - Core app_router.dart — is route registered?
+  - RouterNames constants — any typo?
+  - The GoRouter.of(context).push/go call — correct path used?
+
+CRASH:
+  - Full stack trace analysis
+  - Find the root cause file and line
+  - Check for null access on nullable, type cast failure, or
+    widget lifecycle issue (using context after dispose)
+
+PERF_ISSUE:
+  - Check for BlocBuilder without buildWhen at high level
+  - Check for setState in large widget trees
+  - Check for ListView with children (should be .builder)
+  - Check for missing const constructors
+  - Check for Opacity widget (use Color.withOpacity instead)
+  - Check for ClipRRect inside list items
+  - Check for image loading without cacheWidth/cacheHeight
+  - Check for logic/calculations inside build()
+
+DATA_WRONG:
+  - Model's fromJson — check null handling and key names
+  - Check if API response structure matches the model
+  - Check if repo is mapping model correctly to entity
+  - Check if cubit state copyWith is updating the right field</span>
+
+<span class="hl">Step 3: Root Cause Report</span>
+<span class="op">Output:
+
+ROOT CAUSE:
+  File:    [file path]
+  Line:    [approximate line]
+  Reason:  [exact explanation of why the bug occurs]
+
+CONTRIBUTING FACTORS:
+  [any secondary issues found while reading the code]
+
+FIX PLAN:
+  [ ] Change X in file Y → reason
+  [ ] Change A in file B → reason
+  
+WILL NOT TOUCH:
+  [everything outside the fix scope]</span>
+
+<span class="imp">⏸ Stop here. Wait for my confirmation before applying the fix.</span>
+
+<span class="sec">### Phase 2 — Fix</span>
+
+<span class="hl">Fix Rules:</span>
+<span class="op">- Change ONLY the files identified in the root cause
+- Make the MINIMUM change needed to fix the bug
+- Do NOT refactor unrelated code while fixing
+- Do NOT "improve" other things you notice (create a separate task)
+- Add a comment above the fix: // Fix: [brief explanation]</span>
+
+<span class="hl">For STATE_ISSUE specifically:</span>
+<span class="op">Common fixes to check:
+- Add/fix buildWhen: (prev, curr) => prev.xxx != curr.xxx
+- Switch BlocBuilder → BlocSelector for single field
+- Fix copyWith call that wasn't updating the right field
+- Ensure emit() is not called with same state reference
+- Check if BlocProvider is placed high enough in the tree</span>
+
+<span class="hl">For API_FAILURE specifically:</span>
+<span class="op">Common fixes to check:
+- Fix fromJson null safety: json['key'] as String? ?? ''
+- Fix toJson missing field
+- Fix wrong ApiEndpoints constant
+- Fix wrong response['data'] vs response['result'] key
+- Fix isFormData missing for file upload endpoint</span>
+
+<span class="hl">For CRASH specifically:</span>
+<span class="op">Common fixes to check:
+- Add null check: value ?? defaultValue
+- Fix mounted check before setState/emit after async
+- Fix type: (value as Map<String, dynamic>) 
+- Fix late variable initialized too early/late</span>
+
+<span class="hl">For PERF_ISSUE specifically:</span>
+<span class="op">Apply in order of impact:
+1. Add buildWhen to all BlocBuilders in the affected screen
+2. Convert ListView to ListView.builder
+3. Add const to all static widgets
+4. Add RepaintBoundary around heavy animated widget
+5. Add cacheWidth/cacheHeight to all network images</span>
+
+<span class="sec">### Phase 3 — Verify</span>
+<span class="op">After fix, confirm:
+- The specific repro steps from {{REPRO_STEPS}} no longer trigger the bug
+- No new violations introduced
+- Surrounding code still works (no regressions)
+- Run dart analyze — zero errors</span>
+
+<span class="sec">### Deliverables</span>
+<span class="var">1. Root cause report [CONFIRMATION NEEDED]</span>
+<span class="var">2. Changed files only (minimum change)</span>
+<span class="var">3. Explanation of the fix in plain words</span>
+<span class="var">4. Any related issues found (to handle separately)</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{FEATURE_NAME}}</span><span class="vr-v">اسم الـ Feature · مثال: ProductCatalog</span></div>
+      <div class="vr"><span class="vr-k">{{BUG_TYPE}}</span><span class="vr-v">UI_WRONG / STATE_ISSUE / API_FAILURE / NAVIGATION_BUG / CRASH / PERF_ISSUE / DATA_WRONG</span></div>
+      <div class="vr"><span class="vr-k">{{BUG_DESCRIPTION}}</span><span class="vr-v">وصف المشكلة بالتفصيل · مثال: "قائمة المنتجات مش بتتحدث بعد الإضافة للكارت"</span></div>
+      <div class="vr"><span class="vr-k">{{REPRO_STEPS}}</span><span class="vr-v">مثال: "1. افتح المنتجات 2. اضغط إضافة لكارت 3. ارجع للقائمة — العدد مش بيتغير"</span></div>
+      <div class="vr"><span class="vr-k">{{EXPECTED_BEHAVIOR}}</span><span class="vr-v">السلوك المفروض يحصل</span></div>
+      <div class="vr"><span class="vr-k">{{ACTUAL_BEHAVIOR}}</span><span class="vr-v">اللي بيحصل فعلاً</span></div>
+      <div class="vr"><span class="vr-k">{{ERROR_MESSAGE}}</span><span class="vr-v">الـ stack trace أو الـ error message كاملاً — اتركه فاضي لو مفيش crash</span></div>
+      <div class="vr"><span class="vr-k">{{AFFECTED_FILES}}</span><span class="vr-v">لو بتعرف الملفات المتأثرة، اكتبها — اتركه فاضي لو مش عارف</span></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;">
+      <div class="note n-tip" style="margin:0;">
+        <span class="n-icon">💡</span>
+        <div><strong>PERF_ISSUE؟</strong> ابعت البرومبت مع اسم الشاشة البطيئة بس. الـ agent هيعمل performance audit كامل ويعمل priority list للـ fixes.</div>
+      </div>
+      <div class="note n-warn" style="margin:0;">
+        <span class="n-icon">⚠️</span>
+        <div><strong>Crash مع Stack Trace؟</strong> الصق الـ stack trace كامل في <code style="font-family:var(--mono)">{{ERROR_MESSAGE}}</code> — ده أهم معلومة للـ agent.</div>
+      </div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <div style="text-align:center;padding:36px 0 16px;color:var(--dim);font-size:12px;border-top:1px solid var(--border);">
     <p>Flutter AI Prompt Guide — Customized for View · Section · Widget Architecture</p>
     <p style="margin-top:5px;">Cubit · GetIt · ApiResult · GoRouter · Figma MCP</p>
   </div>
+
 
 </main>
 </div>
