@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flutter AI Agent — Prompt Guide (Custom Rules)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg:       #08090f;
+    --s1:       #0d1018;
+    --s2:       #121622;
+    --s3:       #181d2c;
+    --border:   #1c2236;
+    --border2:  #232b42;
+    --blue:     #3b82f6;
+    --indigo:   #6366f1;
+    --teal:     #14b8a6;
+    --green:    #22c55e;
+    --orange:   #f97316;
+    --red:      #ef4444;
+    --yellow:   #eab308;
+    --pink:     #ec4899;
+    --text:     #dde4f0;
+    --muted:    #8899b4;
+    --dim:      #445066;
+    --mono:     'JetBrains Mono', monospace;
+    --sans:     'IBM Plex Sans Arabic', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.75;
+  }
+
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+  /* ── LAYOUT ── */
+  .wrap { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 256px;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    background: var(--s1);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 24px 0 40px;
+    z-index: 50;
+  }
+
+  .sb-brand {
+    padding: 0 18px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .sb-logo {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .sb-brand-text { font-size: 13px; font-weight: 700; line-height: 1.3; }
+  .sb-brand-text span { display: block; font-size: 10px; font-weight: 400; color: var(--muted); }
+
+  .sb-group { padding: 0 10px; margin-bottom: 6px; }
+
+  .sb-group-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--dim);
+    padding: 8px 8px 5px;
+  }
+
+  .sb-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    color: var(--muted);
+    font-size: 12.5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all .15s;
+  }
+
+  .sb-link:hover { background: var(--s2); color: var(--text); }
+  .sb-link.active { background: rgba(59,130,246,.1); color: #93c5fd; }
+
+  .sb-num {
+    width: 19px; height: 19px;
+    border-radius: 5px;
+    font-family: var(--mono);
+    font-size: 9.5px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ── MAIN ── */
+  .main {
+    flex: 1;
+    margin-right: 256px;
+    max-width: 840px;
+    padding: 0 44px 100px;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    padding: 60px 0 44px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 52px;
+    position: relative;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -44px; right: -44px; height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #3b82f6 40%, #6366f1 60%, transparent 100%);
+  }
+
+  .cv-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(59,130,246,.08);
+    border: 1px solid rgba(59,130,246,.22);
+    color: #93c5fd;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+  }
+
+  .cover h1 { font-size: clamp(26px, 3.8vw, 42px); font-weight: 700; line-height: 1.2; margin-bottom: 14px; }
+
+  .grad { background: linear-gradient(130deg, #60a5fa, #a78bfa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .cv-sub { font-size: 14.5px; color: var(--muted); max-width: 540px; margin-bottom: 28px; line-height: 1.7; }
+
+  .cv-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .pill {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--s2); border: 1px solid var(--border2);
+    padding: 5px 12px; border-radius: 20px;
+    font-size: 11.5px; color: var(--muted);
+  }
+
+  .pd { width: 5px; height: 5px; border-radius: 50%; }
+
+  /* ── RULES BANNER ── */
+  .rules-banner {
+    background: rgba(20,184,166,.06);
+    border: 1px solid rgba(20,184,166,.2);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-bottom: 48px;
+    font-size: 13px;
+    color: #5eead4;
+    line-height: 1.7;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .rules-banner .rb-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── SECTION ── */
+  .ps {
+    margin-bottom: 68px;
+    scroll-margin-top: 20px;
+  }
+
+  .ps-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 22px;
+  }
+
+  .ps-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .ps-head-text h2 { font-size: 21px; font-weight: 700; margin-bottom: 2px; }
+  .ps-head-text p { font-size: 12.5px; color: var(--muted); }
+
+  /* ── PHASE TAG ── */
+  .phase {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    padding: 3px 11px; border-radius: 14px; margin-bottom: 14px;
+  }
+  .ph-blue   { background:rgba(59,130,246,.1);  color:#93c5fd;  border:1px solid rgba(59,130,246,.22); }
+  .ph-teal   { background:rgba(20,184,166,.1);  color:#5eead4;  border:1px solid rgba(20,184,166,.22); }
+  .ph-yellow { background:rgba(234,179,8,.1);   color:#fde047;  border:1px solid rgba(234,179,8,.22); }
+  .ph-pink   { background:rgba(236,72,153,.1);  color:#f9a8d4;  border:1px solid rgba(236,72,153,.22); }
+  .ph-orange { background:rgba(249,115,22,.1);  color:#fdba74;  border:1px solid rgba(249,115,22,.22); }
+
+  /* ── PROMPT CARD ── */
+  .pc {
+    background: var(--s1);
+    border: 1px solid var(--border2);
+    border-radius: 13px;
+    overflow: hidden;
+    margin: 14px 0;
+  }
+
+  .pc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--s2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pc-title { display: flex; align-items: center; gap: 9px; }
+  .pc-title .pct-label { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+
+  .copy-btn {
+    background: rgba(59,130,246,.1);
+    border: 1px solid rgba(59,130,246,.22);
+    color: #93c5fd;
+    font-size: 11px; font-weight: 600;
+    padding: 4px 11px; border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all .15s;
+    display: flex; align-items: center; gap: 5px;
+  }
+
+  .copy-btn:hover { background: rgba(59,130,246,.18); }
+  .copy-btn.ok { background: rgba(34,197,94,.12); border-color: rgba(34,197,94,.25); color: #86efac; }
+
+  .pc-body { padding: 18px 20px; direction: ltr; text-align: left; }
+
+  .pc-body pre {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.8;
+    color: #c2d0e8;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* syntax colors */
+  .kw  { color: #7dd3fc; }
+  .sec { color: #a78bfa; font-weight: 600; }
+  .hl  { color: #34d399; }
+  .str { color: #86efac; }
+  .cmt { color: #3d4f68; }
+  .var { color: #fbbf24; }
+  .imp { color: #fb923c; font-weight: 600; }
+  .op  { color: #94a3b8; }
+  .bad { color: #f87171; }
+  .ref { color: #e879f9; }
+
+  /* ── NOTE ── */
+  .note {
+    display: flex; gap: 11px;
+    padding: 13px 17px; border-radius: 9px;
+    font-size: 12.5px; line-height: 1.65;
+    margin: 14px 0;
+  }
+  .n-info { background:rgba(59,130,246,.07);  border:1px solid rgba(59,130,246,.2);  color:#93c5fd; }
+  .n-tip  { background:rgba(20,184,166,.07);  border:1px solid rgba(20,184,166,.2);  color:#5eead4; }
+  .n-warn { background:rgba(234,179,8,.07);   border:1px solid rgba(234,179,8,.2);   color:#fde047; }
+  .n-rule { background:rgba(239,68,68,.07);   border:1px solid rgba(239,68,68,.2);   color:#fca5a5; }
+  .n-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── VARS TABLE ── */
+  .vt {
+    background: var(--s2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 12px 0 20px;
+  }
+
+  .vt-title {
+    font-size: 10px; font-weight: 700; color: var(--dim);
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 10px;
+    display: flex; align-items: center; gap: 6px;
+  }
+
+  .vr {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 11.5px;
+  }
+  .vr:last-child { border-bottom: none; }
+  .vr-k { font-family: var(--mono); color: var(--yellow); min-width: 170px; flex-shrink: 0; }
+  .vr-v { color: var(--muted); }
+
+  /* ── RULE CHIPS ── */
+  .rule-chips { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 11px; border-radius: 20px;
+    font-size: 11px; font-weight: 500;
+  }
+  .chip-red   { background:rgba(239,68,68,.08);  border:1px solid rgba(239,68,68,.2);  color:#fca5a5; }
+  .chip-green { background:rgba(34,197,94,.08);  border:1px solid rgba(34,197,94,.2);  color:#86efac; }
+
+  /* ── DIVIDER ── */
+  hr.div { border: none; border-top: 1px solid var(--border); margin: 44px 0; }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch {
+    background: var(--s1);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 18px 20px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    direction: ltr;
+    line-height: 1.9;
+    margin: 14px 0;
+    color: #c2d0e8;
+  }
+
+  /* ── BACK DIVIDER ── */
+  .back-div {
+    display: flex; align-items: center; gap: 14px;
+    margin: 4px 0 36px;
+  }
+  .back-div-line { flex: 1; height: 1px; }
+  .back-div-pill {
+    background:rgba(249,115,22,.1);
+    border:1px solid rgba(249,115,22,.22);
+    color:#fb923c;
+    font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+    padding:5px 18px; border-radius:18px;
+    white-space:nowrap;
+  }
+
+  /* PRINT */
+  @media print {
+    .sidebar { display: none; }
+    .main { margin-right: 0; padding: 20px; }
+    .copy-btn { display: none; }
+    body { background: #fff; color: #111; }
+  }
+
+  @media (max-width: 960px) {
+    .wrap { flex-direction: column; }
+    .sidebar {
+      position: static;
+      width: 100%;
+      max-height: none;
+      border-left: none;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 14px 20px;
+    }
+    .main {
+      margin-right: 0;
+      padding: 18px 14px 80px;
+      max-width: 100%;
+    }
+    .sb-group { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sb-link { flex: 1 1 46%; min-width: 42%; }
+  }
+
+  @media (max-width: 768px) {
+    .sidebar { position: static; display: block; }
+    .main { margin-right: 0; padding: 14px 12px 80px; }
+    .cover { padding: 45px 0 24px; }
+    .ps-head-text h2 { font-size: 18px; }
+    .pc-body pre { font-size: 13px; }
+    .sb-group { gap: 4px; }
+    .sb-link { flex: 1 1 100%; min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<nav class="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">⚡</div>
+    <div class="sb-brand-text">
+      Prompt Guide
+      <span>View · Section · Widget</span>
+    </div>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-group-label">Flutter Prompts</div>
+    <a class="sb-link" href="#p1">
+      <span class="sb-num" style="background:rgba(99,102,241,.15);color:#a5b4fc;">01</span>
+      قراءة التصميم MCP
+    </a>
+    <a class="sb-link" href="#p2">
+      <span class="sb-num" style="background:rgba(20,184,166,.15);color:#5eead4;">02</span>
+      Global Core Setup
+    </a>
+    <a class="sb-link" href="#p3">
+      <span class="sb-num" style="background:rgba(234,179,8,.15);color:#fde047;">03</span>
+      Feature Scaffold
+    </a>
+    <a class="sb-link" href="#p4">
+      <span class="sb-num" style="background:rgba(236,72,153,.15);color:#f9a8d4;">04</span>
+      Screen (View→Section→Widget)
+    </a>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-group-label">Backend Prompts</div>
+    <a class="sb-link" href="#b1">
+      <span class="sb-num" style="background:rgba(249,115,22,.15);color:#fdba74;">05</span>
+      API Collection Setup
+    </a>
+    <a class="sb-link" href="#b2">
+      <span class="sb-num" style="background:rgba(239,68,68,.15);color:#fca5a5;">06</span>
+      Connect Feature to API
+    </a>
+  </div>
+
+  <div class="sb-group">
+    <div class="sb-group-label">مرجع سريع</div>
+    <a class="sb-link" href="#arch">
+      <span style="font-size:13px;">🏛️</span> Architecture Cheatsheet
+    </a>
+    <a class="sb-link" href="#forbidden">
+      <span style="font-size:13px;">🚫</span> Forbidden Practices
+    </a>
+  </div>
+</nav>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="main">
+
+  <!-- COVER -->
+  <div class="cover">
+    <div class="cv-tag">⚡ Customized to Your Rules File</div>
+    <h1>Flutter AI Agent<br><span class="grad">Prompt Playbook By Ahmed Slman</span></h1>
+    
+    <p class="cv-sub">
+      برومبتات مظبوطة على معمارية <strong>View → Section → Widget</strong> وكل الـ rules بتاعتك — Cubit, GetIt, ApiResult, Fold pattern, AppColors, Localization.
+    </p>
+    <div class="cv-pills">
+      <div class="pill"><div class="pd" style="background:#6366f1"></div> View·Section·Widget</div>
+      <div class="pill"><div class="pd" style="background:#14b8a6"></div> Cubit Only</div>
+      <div class="pill"><div class="pd" style="background:#3b82f6"></div> ApiResult + Fold</div>
+      <div class="pill"><div class="pd" style="background:#eab308"></div> GetIt DI</div>
+      <div class="pill"><div class="pd" style="background:#f97316"></div> GoRouter</div>
+    </div>
+  </div>
+
+  <!-- RULES BANNER -->
+  <div class="rules-banner">
+    <span class="rb-icon">📌</span>
+    <div>
+      <strong>قبل ما تبعت أي برومبت:</strong> تأكد إن الـ Rules file متفعّل في الـ agent (`.cursorrules` / Project Instructions).
+      كل برومبت هنا بيفترض إن الـ agent عارف الـ rules وبيشتغل بالمعمارية بتاعتك بالظبط.
+      لو الـ agent خرج عن الـ rules، قوله بالاسم الصريح: <code style="font-family:var(--mono)">"Violated rule [X]. Fix only this, nothing else."</code>
+    </div>
+  </div>
+
+  <!-- ══════ P1: READ DESIGN ══════ -->
+  <section class="ps" id="p1">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(99,102,241,.1);">🔍</div>
+      <div class="ps-head-text">
+        <h2>01 — قراءة التصميم عبر Figma MCP</h2>
+        <p>أول حاجة في أي مشروع — الـ Agent يقرأ الـ Figma ويعمل Design Map بالكامل</p>
+      </div>
+    </div>
+
+    <div class="phase ph-blue">Figma MCP · مرة واحدة في بداية المشروع</div>
+
+    <div class="note n-warn">
+      <span class="n-icon">⚠️</span>
+      <div>البرومبت ده <strong>بيطلب Map بس — لا كود</strong>. وافق على الـ Map وبعدين انتقل للخطوة التانية. ده بيمنع إن الـ agent يبني على فهم غلط.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>📋</span><span class="pct-label">prompt-01-read-design.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pr1')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pr1"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 01 — Read & Map Figma Design
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer working on this project.</span>
+<span class="kw">Follow all project rules strictly. Respond in Egyptian Arabic.</span>
+
+<span class="sec">## Task: Read Figma & Build Design Map</span>
+
+<span class="op">Using Figma MCP, connect to:</span>
+<span class="str">Figma URL: {{FIGMA_FILE_URL}}</span>
+
+<span class="sec">### Step 1 — Design System Page ("_Design System")</span>
+<span class="op">Extract and map:</span>
+- All Color Variables  → names to use in AppColors.*
+- All Typography Variables → names to use in predefined text styles
+- All Spacing Variables → values for spacing constants
+- All Radius Variables → names for border radius constants
+
+<span class="sec">### Step 2 — Components Page</span>
+<span class="op">List every Figma Component with:</span>
+- Exact layer name (snake_case)
+- All Variants (states: default, loading, disabled, error, empty…)
+- Component Properties (text labels, boolean toggles, etc.)
+- Where it appears across screens (for reuse decisions)
+
+<span class="sec">### Step 3 — Screens Page</span>
+<span class="op">For every screen frame:</span>
+- Exact layer name → will become the View class name
+- Identifiable Sections (logical groups of widgets)
+- List of Component instances used
+- Dev Mode annotations if present
+- Navigation target (from prototype links)
+
+<span class="sec">### Output Required</span>
+
+<span class="hl">DESIGN TOKENS:</span>
+  Colors:     [Figma variable name → AppColors.xxx]
+  Typography: [Figma variable name → text style name]
+  Spacing:    [variable → value in dp]
+  Radius:     [variable → value in dp]
+
+<span class="hl">COMPONENTS:</span>
+  [layer_name]: variants=[...], props=[...], used_in=[...]
+
+<span class="hl">SCREENS MAP:</span>
+  [screen_layer_name]:
+    suggested_view:     XxxView
+    suggested_sections: [XxxSection, YyySection, ...]
+    components_used:    [...]
+    navigates_to:       [...]
+    annotations:        [...]
+
+<span class="hl">QUESTIONS / UNCLEAR:</span>
+  [anything ambiguous in the design that needs clarification]
+
+<span class="imp">⛔ Do NOT write any Dart code in this step.</span>
+<span class="imp">⛔ Do NOT create any files.</span>
+<span class="imp">✅ Output only the structured map above.</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{FIGMA_FILE_URL}}</span><span class="vr-v">الرابط الكامل لملف Figma · مثال: https://figma.com/file/ABC123/App-Name</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ P2: GLOBAL SETUP ══════ -->
+  <section class="ps" id="p2">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(20,184,166,.1);">🏗️</div>
+      <div class="ps-head-text">
+        <h2>02 — Global Core Setup</h2>
+        <p>تحديث ملفات الـ core/theme بالقيم الفعلية من Figma</p>
+      </div>
+    </div>
+
+    <div class="phase ph-teal">Core · مرة واحدة في البداية</div>
+
+    <div class="note n-info">
+      <span class="n-icon">ℹ️</span>
+      <div>الـ project عنده بالفعل ملفات في <code style="font-family:var(--mono)">lib/core/theme/</code> — البرومبت ده بيحدّثها بالقيم الفعلية من Figma، مش بيعملها من الأول.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>⚙️</span><span class="pct-label">prompt-02-global-setup.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pr2')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pr2"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 02 — Global Core Setup from Figma
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">Never hardcode colors, sizes, or text styles.</span>
+
+<span class="sec">## Context</span>
+<span class="str">Project:    {{PROJECT_NAME}}</span>
+<span class="str">Package:    {{PACKAGE_NAME}}</span>
+<span class="str">Font:       {{FONT_NAME}}  (already added to pubspec.yaml)</span>
+<span class="str">Figma URL:  {{FIGMA_FILE_URL}}</span>
+<span class="str">Supports Dark Mode: {{DARK_MODE}}</span>
+
+<span class="sec">## Task: Update core/theme/ Files from Figma Design System</span>
+
+<span class="op">Use Figma MCP to read the "_Design System" page, then update these files:</span>
+
+<span class="hl">1. lib/core/theme/app_colors.dart</span>
+<span class="op">   - Map every Figma color variable → static const Color in AppColors
+   - Group by: primary, secondary, neutral, semantic (error/warning/success/info)
+   - If dark mode supported: add separate AppDarkColors or use Color pairs
+   - Add inline comment: // Figma: colors/brand/primary</span>
+
+<span class="hl">2. lib/core/theme/</span>
+<span class="op">   Update the existing text styles file with:
+   - Font family: {{FONT_NAME}}
+   - Map Figma typography variables → TextStyle constants
+   - Cover: displayLarge, headlineMedium, headlineSmall,
+            titleLarge, titleMedium, bodyLarge, bodyMedium,
+            bodySmall, labelMedium, labelSmall
+   - Add inline comment: // Figma: typography/heading/h1</span>
+
+<span class="hl">3. lib/core/utils/ or lib/core/theme/</span>
+<span class="op">   Update or create spacing/radius constants:
+   - Spacing: xs(4), sm(8), md(16), lg(24), xl(32), xxl(48) — or map from Figma
+   - Radius: sm, md, lg, xl, full — from Figma radius variables</span>
+
+<span class="hl">4. lib/core/theme/app_theme.dart (or theme_manager)</span>
+<span class="op">   Update ThemeData with:
+   - colorScheme from AppColors
+   - textTheme from text styles
+   - elevatedButtonTheme, outlinedButtonTheme
+   - inputDecorationTheme
+   - appBarTheme
+   - scaffoldBackgroundColor</span>
+
+<span class="sec">## Rules</span>
+<span class="imp">✅ Only update existing files. Do NOT restructure core/</span>
+<span class="imp">✅ Every value must come from Figma — no assumed values</span>
+<span class="imp">✅ Use const constructors everywhere possible</span>
+<span class="imp">✅ Keep each file under 200 lines</span>
+<span class="imp">⛔ No hardcoded HEX strings directly in widgets</span>
+<span class="imp">⛔ No hardcoded fontSize or fontWeight in widgets</span>
+
+<span class="sec">## Delivery</span>
+<span class="op">Show one file at a time. Wait for my approval before moving to the next.</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{PROJECT_NAME}}</span><span class="vr-v">اسم التطبيق · مثال: "Mawgood E-Commerce"</span></div>
+      <div class="vr"><span class="vr-k">{{PACKAGE_NAME}}</span><span class="vr-v">مثال: com.company.mawgood</span></div>
+      <div class="vr"><span class="vr-k">{{FONT_NAME}}</span><span class="vr-v">الخط الموجود في pubspec · مثال: Cairo</span></div>
+      <div class="vr"><span class="vr-k">{{FIGMA_FILE_URL}}</span><span class="vr-v">نفس الرابط من البرومبت الأول</span></div>
+      <div class="vr"><span class="vr-k">{{DARK_MODE}}</span><span class="vr-v">true / false</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ P3: FEATURE SCAFFOLD ══════ -->
+  <section class="ps" id="p3">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(234,179,8,.1);">🧩</div>
+      <div class="ps-head-text">
+        <h2>03 — Feature Scaffold</h2>
+        <p>بيجهز الـ feature folder كامل بنفس البنية الموجودة في المشروع</p>
+      </div>
+    </div>
+
+    <div class="phase ph-yellow">Feature · مكرر لكل Feature جديدة</div>
+
+    <div class="note n-tip">
+      <span class="n-icon">💡</span>
+      <div>البرومبت ده بيعمل <strong>الـ boilerplate بس</strong> — cubit, model, repo, di, router, وstub views/sections/widgets. <strong>لا UI تفصيلي، لا API calls حقيقية.</strong> ده بييجي في الخطوات الجاية.</div>
+    </div>
+
+    <div class="arch">lib/features/<span class="var">{{FEATURE_FOLDER}}</span>/
+├── cubit/
+│   ├── <span class="str">feature_cubit.dart</span>       <span class="cmt"># Business logic only, connects repo ↔ sections</span>
+│   └── <span class="str">feature_states.dart</span>      <span class="cmt"># Sealed/abstract states</span>
+├── data/
+│   ├── model/
+│   │   └── <span class="str">feature_model.dart</span>   <span class="cmt"># fromJson / toJson / copyWith</span>
+│   ├── repo/
+│   │   └── <span class="str">feature_repo.dart</span>    <span class="cmt"># Calls data_source, owns merging logic</span>
+│   └── data_source/
+│       └── <span class="str">feature_remote_ds.dart</span> <span class="cmt"># Direct API calls via ApiConsumer</span>
+├── di/
+│   └── <span class="str">feature_di.dart</span>          <span class="cmt"># GetIt registrations</span>
+├── router/
+│   └── <span class="str">feature_router.dart</span>      <span class="cmt"># GoRouter routes, registered in core router</span>
+└── presentation/
+    ├── views/               <span class="cmt"># Full screens — combine sections only</span>
+    │   └── <span class="str">feature_view.dart</span>
+    ├── sections/            <span class="cmt"># Logic bridge — connects cubit, passes data to widgets</span>
+    │   └── <span class="str">feature_section.dart</span>
+    └── widgets/             <span class="cmt"># Pure UI only — NO logic, NO cubit access</span>
+        └── <span class="str">feature_widget.dart</span></div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>🧩</span><span class="pct-label">prompt-03-feature-scaffold.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pr3')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pr3"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 03 — Feature Scaffold
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">MUST follow View → Section → Widget architecture strictly.</span>
+
+<span class="sec">## Task: Scaffold New Feature</span>
+
+<span class="str">Feature Name (PascalCase): {{FEATURE_NAME}}</span>
+<span class="str">Feature Folder (snake_case): {{FEATURE_FOLDER}}</span>
+<span class="str">Views to create:    {{VIEW_LIST}}</span>
+<span class="str">Main entity fields: {{ENTITY_FIELDS}}</span>
+<span class="str">Repo methods:       {{REPO_METHODS}}</span>
+
+<span class="sec">### Before You Start</span>
+<span class="op">1. Read lib/features/ to understand existing feature patterns
+2. Read lib/core/locator/ to understand how DI is registered
+3. Read lib/core/Router/ to understand how routes are added
+4. Identify any existing shared widgets to reuse</span>
+
+<span class="sec">### Files to Generate</span>
+
+<span class="hl">cubit/{{FEATURE_FOLDER}}_states.dart</span>
+<span class="op">- Abstract or sealed base: {{FEATURE_NAME}}States
+- States: Initial, Loading, Success(data), Error(message)
+- Use copyWith pattern on Success state for granular updates
+- Name: {{FEATURE_NAME}}Cubit, {{FEATURE_NAME}}States</span>
+
+<span class="hl">cubit/{{FEATURE_FOLDER}}_cubit.dart</span>
+<span class="op">- Extends Cubit<{{FEATURE_NAME}}States>
+- Constructor injects {{FEATURE_NAME}}Repo
+- Business logic ONLY — no UI references
+- Methods: one per repo method (e.g., fetch{{FEATURE_NAME}}s())
+- Use ApiResult fold pattern:
+  result.fold(
+    onSuccess: (data) => emit({{FEATURE_NAME}}Success(data)),
+    onFailure: (f) => emit({{FEATURE_NAME}}Error(f.userMessage(context))),
+  );</span>
+
+<span class="hl">data/model/{{FEATURE_FOLDER}}_model.dart</span>
+<span class="op">- Fields: {{ENTITY_FIELDS}}
+- fromJson(Map<String, dynamic> json)
+- toJson() → Map<String, dynamic>
+- copyWith()</span>
+
+<span class="hl">data/data_source/{{FEATURE_FOLDER}}_remote_ds.dart</span>
+<span class="op">- Constructor injects ApiConsumer
+- Methods match repo interface
+- Use ApiConsumer.get/post/put/delete
+- Return raw ApiResult<{{FEATURE_NAME}}Model> (or List)
+- All error handling via ErrorHandler.handleException()
+- MOCK data for now (return static data), mark with // TODO: real API</span>
+
+<span class="hl">data/repo/{{FEATURE_FOLDER}}_repo.dart</span>
+<span class="op">- Abstract class + implementation
+- Implementation injects {{FEATURE_NAME}}RemoteDataSource
+- Calls data source, maps result to domain model
+- Owns merging logic if multiple sources needed</span>
+
+<span class="hl">di/{{FEATURE_FOLDER}}_di.dart</span>
+<span class="op">- Register with GetIt:
+  locator.registerLazySingleton<{{FEATURE_NAME}}RemoteDataSource>(...)
+  locator.registerLazySingleton<{{FEATURE_NAME}}Repo>(...)
+  locator.registerFactory<{{FEATURE_NAME}}Cubit>(...)
+- Import and call this in core/locator/</span>
+
+<span class="hl">router/{{FEATURE_FOLDER}}_router.dart</span>
+<span class="op">- GoRoute entries for each view in {{VIEW_LIST}}
+- Route names as string constants in RouterNames or local constants
+- Register routes in lib/core/Router/app_router.dart</span>
+
+<span class="hl">presentation/views/ — one file per view in {{VIEW_LIST}}</span>
+<span class="op">- Wrap with BlocProvider(create: (_) => locator<{{FEATURE_NAME}}Cubit>()..fetch())
+- Body: Column/Stack of Section widgets ONLY
+- ZERO styling, ZERO BlocBuilder, ZERO direct logic
+- Call fetch on initState or inside the BlocProvider create</span>
+
+<span class="hl">presentation/sections/ — suggested sections from Figma Map</span>
+<span class="op">- Each section: one logical group of widgets
+- Access cubit via context.read<{{FEATURE_NAME}}Cubit>()
+- Use BlocBuilder/BlocConsumer with buildWhen to isolate rebuilds
+- Use BlocSelector for single-field listening
+- Pass ONLY needed data (not full state/model) to child widgets
+- NO design code here — just logic bridging</span>
+
+<span class="hl">presentation/widgets/ — one file per distinct UI element</span>
+<span class="op">- Pure StatelessWidget
+- Receives all data via constructor parameters
+- No cubit access, no context.read, no BuildContext logic
+- const constructor where possible
+- Max ~150 lines per file</span>
+
+<span class="sec">## Strict Rules</span>
+<span class="imp">⛔ No UI logic in Views</span>
+<span class="imp">⛔ No styling/design code in Sections</span>
+<span class="imp">⛔ No cubit access in Widgets</span>
+<span class="imp">⛔ No BlocBuilder at the top of a View without buildWhen</span>
+<span class="imp">⛔ No passing whole State or Model to a Widget that needs only 1-2 fields</span>
+<span class="imp">⛔ No private helper methods like _buildXxx()</span>
+<span class="imp">⛔ No ListView without .builder for dynamic lists</span>
+<span class="imp">✅ Every file must compile with zero errors</span>
+<span class="imp">✅ Run dart format . after generating</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{FEATURE_NAME}}</span><span class="vr-v">PascalCase · مثال: ProductCatalog</span></div>
+      <div class="vr"><span class="vr-k">{{FEATURE_FOLDER}}</span><span class="vr-v">snake_case · مثال: product_catalog</span></div>
+      <div class="vr"><span class="vr-k">{{VIEW_LIST}}</span><span class="vr-v">مثال: ProductsView, ProductDetailView</span></div>
+      <div class="vr"><span class="vr-k">{{ENTITY_FIELDS}}</span><span class="vr-v">مثال: id: String, name: String, price: double, imageUrl: String?</span></div>
+      <div class="vr"><span class="vr-k">{{REPO_METHODS}}</span><span class="vr-v">مثال: getProducts(), getProductById(String id), searchProducts(String q)</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ P4: SCREEN ══════ -->
+  <section class="ps" id="p4">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(236,72,153,.1);">🖥️</div>
+      <div class="ps-head-text">
+        <h2>04 — Screen Implementation (View → Section → Widget)</h2>
+        <p>تنفيذ شاشة واحدة pixel-perfect من Figma باتباع المعمارية بالظبط</p>
+      </div>
+    </div>
+
+    <div class="phase ph-pink">Per Screen · مكرر لكل شاشة</div>
+
+    <div class="note n-warn">
+      <span class="n-icon">⚠️</span>
+      <div><strong>شاشة واحدة كل مرة.</strong> البرومبت بيطلب Widget Plan أول — وافق عليه قبل ما الـ agent يكتب أي كود. ده بيوفر وقت تعديل كتير.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>🖥️</span><span class="pct-label">prompt-04-screen-impl.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pr4')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pr4"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 04 — Screen Implementation
+# View → Section → Widget Pattern
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">Strictly follow View → Section → Widget pattern.</span>
+
+<span class="sec">## Target Screen</span>
+<span class="str">View Class:    {{VIEW_CLASS_NAME}}</span>
+<span class="str">View File:     lib/features/{{FEATURE_FOLDER}}/presentation/views/{{VIEW_FILE}}.dart</span>
+<span class="str">Figma Layer:   {{FIGMA_LAYER_NAME}}</span>
+<span class="str">Figma URL:     {{FIGMA_FILE_URL}}</span>
+<span class="str">Feature Cubit: {{FEATURE_NAME}}Cubit</span>
+
+<span class="sec">### Phase 1 — Read Figma Layer (MCP)</span>
+<span class="op">Navigate to "{{FIGMA_LAYER_NAME}}" and extract:
+- All padding/gap values → map to AppSpacing.*
+- All colors → map to AppColors.*
+- All text styles → map to existing text style names
+- Auto Layout direction → Column / Row
+- Scrollable frames → SingleChildScrollView / ListView.builder
+- Overlapping elements → Stack (only if unavoidable)
+- Every Figma Component instance → identify existing Flutter widget or create new</span>
+
+<span class="sec">### Phase 2 — Widget Tree Plan (WAIT FOR APPROVAL)</span>
+<span class="op">Before writing any code, output this plan:</span>
+
+<span class="hl">VIEW: {{VIEW_CLASS_NAME}}</span>
+<span class="op">  └── Scaffold
+        ├── AppBar (if present)
+        └── Body
+              ├── SectionA (→ file: xxx_section.dart)
+              │     ├── WidgetA1 (→ file: xxx_widget.dart) — props: [...]
+              │     └── WidgetA2 (→ file: yyy_widget.dart) — props: [...]
+              └── SectionB (→ file: yyy_section.dart)
+                    └── WidgetB1 (existing: AppDefaultButton) — reused ✅</span>
+
+<span class="hl">THEME MAPPING:</span>
+<span class="op">  AppColors used:    [list]
+  Text styles used:  [list]
+  AppSpacing used:   [list]</span>
+
+<span class="hl">STATE HANDLING:</span>
+<span class="op">  Loading state →  [which widget shows shimmer]
+  Error state →    [which section shows error + retry]
+  Empty state →    [which section shows empty widget]
+  Success state →  [normal render]</span>
+
+<span class="imp">⏸ Stop here. Wait for my approval before writing code.</span>
+
+<span class="sec">### Phase 3 — Implementation (after approval)</span>
+
+<span class="hl">View File Rules:</span>
+<span class="op">- StatelessWidget or ConsumerWidget
+- Wraps with BlocProvider if needed (use locator)
+- Body is ONLY a Column/Stack of Section widgets
+- ZERO styling, ZERO BlocBuilder, ZERO business logic
+- AppBar built via existing AppCustomAppBar if available</span>
+
+<span class="hl">Section File Rules:</span>
+<span class="op">- Access cubit: context.read<{{FEATURE_NAME}}Cubit>()
+- Use BlocBuilder with buildWhen OR BlocSelector for single fields
+- Handle ALL states: loading → shimmer, error → error widget, 
+  empty → empty widget, success → pass data to widgets
+- Pass ONLY required fields to each child Widget (not full model)
+- NO design code, NO styling, NO decoration in sections
+- Trigger events in initState via PostFrameCallback or section init</span>
+
+<span class="hl">Widget File Rules:</span>
+<span class="op">- Pure StatelessWidget
+- const constructor
+- All data via constructor parameters
+- NO BuildContext logic, NO cubit, NO navigation
+- Use AppColors.*, AppSpacing.*, predefined text styles ONLY
+- Max 150 lines — split if larger
+- NO private helper methods like _buildXxx()</span>
+
+<span class="hl">Performance Rules (from project rules):</span>
+<span class="op">- const everything possible
+- BlocSelector for single-field listening
+- buildWhen on every BlocBuilder
+- RepaintBoundary around animated/complex widgets
+- cached_network_image for all remote images with cacheWidth/cacheHeight
+- ListView.builder (never ListView with children for dynamic lists)
+- BoxDecoration with borderRadius instead of ClipRRect where possible
+- Color.withOpacity() instead of Opacity widget</span>
+
+<span class="hl">Localization:</span>
+<span class="op">- All user-facing strings via context.l10n.xxx
+- NO hardcoded Arabic or English strings in widgets</span>
+
+<span class="sec">### Phase 4 — Extraction</span>
+<span class="op">After main files, identify widgets that appear in multiple places.
+Move them to:
+- lib/core/common/widgets/ if reusable across features
+- lib/shared/ if shared between a few features
+- lib/features/{{FEATURE_FOLDER}}/presentation/widgets/ if feature-specific</span>
+
+<span class="sec">### Deliverables</span>
+<span class="var">1. Widget tree plan [APPROVAL NEEDED]</span>
+<span class="var">2. View file — clean, no logic</span>
+<span class="var">3. Section files — logic only, no styling</span>
+<span class="var">4. Widget files — pure UI, no logic</span>
+<span class="var">5. Summary of what's mocked vs connected to real state</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{VIEW_CLASS_NAME}}</span><span class="vr-v">PascalCase · مثال: ProductsView</span></div>
+      <div class="vr"><span class="vr-k">{{FEATURE_FOLDER}}</span><span class="vr-v">snake_case · مثال: product_catalog</span></div>
+      <div class="vr"><span class="vr-k">{{VIEW_FILE}}</span><span class="vr-v">snake_case · مثال: products_view</span></div>
+      <div class="vr"><span class="vr-k">{{FIGMA_LAYER_NAME}}</span><span class="vr-v">اسم الـ Layer بالظبط كما في Figma</span></div>
+      <div class="vr"><span class="vr-k">{{FIGMA_FILE_URL}}</span><span class="vr-v">رابط Figma</span></div>
+      <div class="vr"><span class="vr-k">{{FEATURE_NAME}}</span><span class="vr-v">PascalCase · مثال: ProductCatalog</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- BACK DIVIDER -->
+  <div class="back-div">
+    <div class="back-div-line" style="background:linear-gradient(90deg,var(--orange),transparent)"></div>
+    <div class="back-div-pill">Backend Prompts</div>
+    <div class="back-div-line" style="background:linear-gradient(270deg,var(--orange),transparent)"></div>
+  </div>
+
+  <!-- ══════ B1: API COLLECTION ══════ -->
+  <section class="ps" id="b1">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(249,115,22,.1);">📦</div>
+      <div class="ps-head-text">
+        <h2 style="color:#fb923c;">05 — API Collection Setup</h2>
+        <p>بيقرأ ملف الـ Collection ويولّد كل الـ API Layer باستخدام ApiConsumer و ApiResult</p>
+      </div>
+    </div>
+
+    <div class="phase ph-orange">Backend · مرة واحدة أو عند إضافة collection</div>
+
+    <div class="note n-tip">
+      <span class="n-icon">💡</span>
+      <div>حط الـ Collection file في <code style="font-family:var(--mono)">docs/api/</code> في المشروع. البرومبت ده بيولّد ApiEndpoints, Request Models, Response Models, وDataSources — كلها باستخدام الـ <code style="font-family:var(--mono)">ApiConsumer</code> و<code style="font-family:var(--mono)">ApiResult&lt;T&gt;</code> الموجودين في المشروع.</div>
+    </div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>📦</span><span class="pct-label">prompt-05-api-collection.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pb1')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pb1"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 05 — API Collection Setup
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">Use ApiConsumer and ApiResult<T> — never use Dio directly in data sources.</span>
+
+<span class="sec">## Context</span>
+<span class="str">Collection File:  {{COLLECTION_FILE_PATH}}</span>
+<span class="str">Collection Type:  {{COLLECTION_TYPE}}</span>
+<span class="str">Base URL Env Key: {{BASE_URL_ENV_KEY}}</span>
+<span class="str">Auth Type:        {{AUTH_TYPE}}</span>
+
+<span class="sec">### Step 1 — Analyze Before Coding</span>
+<span class="op">Read the collection file and output:
+- List of all endpoints grouped by feature folder
+- For each endpoint: method, path, request body fields, response schema
+- Shared/reusable response wrappers (e.g., pagination wrapper, data wrapper)
+- Auth requirements per endpoint group</span>
+
+<span class="imp">⏸ Wait for my approval on the analysis before generating code.</span>
+
+<span class="sec">### Step 2 — Update API Endpoints</span>
+
+<span class="hl">lib/core/network/api_endpoints.dart (or equivalent)</span>
+<span class="op">Add:
+  static const String endpointName = '/path/to/endpoint';
+  // Group by feature. Add comment with HTTP method: // GET
+  // NEVER hardcode base URL here</span>
+
+<span class="sec">### Step 3 — Generate Models per Feature</span>
+
+<span class="hl">Request Models</span>
+<span class="op">lib/features/{{feature}}/data/model/{{name}}_request_model.dart
+- final fields, required in constructor
+- toJson() → Map<String, dynamic>
+- Use @JsonSerializable if project uses it, otherwise manual
+- Optional fields are nullable</span>
+
+<span class="hl">Response Models</span>
+<span class="op">lib/features/{{feature}}/data/model/{{name}}_model.dart
+- fromJson(Map<String, dynamic> json)
+- toJson() → Map<String, dynamic>  
+- copyWith()
+- Handle null safety carefully</span>
+
+<span class="hl">Shared Response Wrapper (if API wraps all responses)</span>
+<span class="op">If all responses have a common wrapper like {data, message, status}:
+Add to lib/core/network/ or reuse existing wrapper model.</span>
+
+<span class="sec">### Step 4 — Generate Data Sources</span>
+
+<span class="hl">lib/features/{{feature}}/data/data_source/{{feature}}_remote_ds.dart</span>
+<span class="op">For each endpoint:
+  Future<ApiResult<{{Model}}>> methodName({{params}}) async {
+    try {
+      final response = await _apiConsumer.get(  // or post/put/delete
+        ApiEndpoints.endpointName,
+        queryParameters: {...},  // if GET
+        data: requestModel.toJson(),  // if POST/PUT
+        isFormData: {{IS_FORM_DATA}},  // true only for file uploads
+      );
+      return ApiResult.success({{Model}}.fromJson(response));
+    } catch (e) {
+      return ApiResult.failure(ErrorHandler.handleException(e));
+    }
+  }</span>
+
+<span class="sec">### Step 5 — Update DI Registration</span>
+<span class="op">For each new model/datasource, ensure it's registered in the feature's di file.
+No new GetIt calls in feature files directly.</span>
+
+<span class="sec">### Step 6 — Environment Variables</span>
+<span class="op">Add to .env.example (ONLY .env.example — never real values in code):
+{{BASE_URL_ENV_KEY}}=https://your-api.com/api/v1
+Add any other env keys found in the collection.</span>
+
+<span class="sec">## Rules</span>
+<span class="imp">✅ Always use ApiConsumer interface — never import Dio directly in data sources</span>
+<span class="imp">✅ Always use ApiResult<T>.fold() pattern — never try/catch in Cubit</span>
+<span class="imp">✅ Always use ApiEndpoints constants — never hardcode strings</span>
+<span class="imp">✅ Use ErrorHandler.handleException() for all catches</span>
+<span class="imp">✅ Use ErrorHandler.handleDioException() for Dio-specific errors</span>
+<span class="imp">⛔ No auth tokens hardcoded anywhere</span>
+<span class="imp">⛔ No direct Dio usage in data sources</span>
+<span class="imp">⛔ No API calls in Repository — only in DataSource</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{COLLECTION_FILE_PATH}}</span><span class="vr-v">مثال: docs/api/app_collection.json</span></div>
+      <div class="vr"><span class="vr-k">{{COLLECTION_TYPE}}</span><span class="vr-v">Postman v2.1 / Bruno / OpenAPI 3.0</span></div>
+      <div class="vr"><span class="vr-k">{{BASE_URL_ENV_KEY}}</span><span class="vr-v">مثال: API_BASE_URL</span></div>
+      <div class="vr"><span class="vr-k">{{AUTH_TYPE}}</span><span class="vr-v">Bearer Token / API-Key / None</span></div>
+      <div class="vr"><span class="vr-k">{{IS_FORM_DATA}}</span><span class="vr-v">true لو في file upload, false غير كده</span></div>
+    </div>
+  </section>
+
+  <!-- ══════ B2: CONNECT FEATURE ══════ -->
+  <section class="ps" id="b2">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(239,68,68,.1);">🔗</div>
+      <div class="ps-head-text">
+        <h2 style="color:#f87171;">06 — Connect Feature to Real API</h2>
+        <p>استبدال الـ mock data بـ real API calls واستخدام fold pattern في الـ Cubit</p>
+      </div>
+    </div>
+
+    <div class="phase ph-orange">Per Feature · مكرر لكل Feature</div>
+
+    <div class="pc">
+      <div class="pc-head">
+        <div class="pc-title"><span>🔗</span><span class="pct-label">prompt-06-connect-api.txt</span></div>
+        <button class="copy-btn" onclick="cp(this,'pb2')">📋 Copy</button>
+      </div>
+      <div class="pc-body"><pre id="pb2"><span class="cmt"># ═══════════════════════════════════════════════
+# PROMPT 06 — Connect Feature to Real API
+# ═══════════════════════════════════════════════</span>
+
+<span class="kw">You are a Senior Flutter Engineer on this project.</span>
+<span class="kw">Follow all project rules. Respond in Egyptian Arabic.</span>
+<span class="kw">Use ApiResult.fold() exclusively — no try/catch in Cubit.</span>
+
+<span class="sec">## Target Feature</span>
+<span class="str">Feature Name:   {{FEATURE_NAME}}</span>
+<span class="str">Feature Folder: lib/features/{{FEATURE_FOLDER}}/</span>
+<span class="str">Endpoints:      {{ENDPOINT_LIST}}</span>
+<span class="str">Auth Required:  {{AUTH_REQUIRED}}</span>
+<span class="str">Pagination:     {{HAS_PAGINATION}}</span>
+<span class="str">Local Cache:    {{HAS_CACHE}}</span>
+
+<span class="sec">### Step 1 — Audit (show results, no code yet)</span>
+<span class="op">Read these files and report:
+- data_source: which methods are mocked → need real API
+- repo: any direct API calls? (violation!) → fix first
+- cubit: is fold pattern used? or try/catch? 
+- sections: any API calls? (violation!) → fix first
+- widgets: any business logic? (violation!) → fix first</span>
+
+<span class="imp">⏸ Show audit results and wait for approval.</span>
+
+<span class="sec">### Step 2 — Fix Violations First</span>
+<span class="op">If audit found any violations (API in repo, logic in widget, etc.)
+fix them before wiring real API.</span>
+
+<span class="sec">### Step 3 — Update Data Source</span>
+
+<span class="hl">{{FEATURE_FOLDER}}_remote_ds.dart</span>
+<span class="op">Replace each // TODO: real API mock with:
+  Future<ApiResult<T>> methodName(params) async {
+    try {
+      final response = await _apiConsumer.get(
+        ApiEndpoints.xxx,
+        queryParameters: params.toMap(),
+      );
+      return ApiResult.success(T.fromJson(response['data']));
+    } catch (e) {
+      return ApiResult.failure(ErrorHandler.handleException(e));
+    }
+  }</span>
+
+<span class="sec">### Step 4 — Update Repository</span>
+<span class="op">If repo was doing direct API calls (violation), fix:
+- Remove any direct API code from repo
+- Repo only calls _dataSource.method()
+- Repo maps response model to domain if needed
+- Repo handles data merging if {{HAS_CACHE}} = true:
+  try remote first → on success cache it → on failure return cached</span>
+
+<span class="sec">### Step 5 — Update Cubit (fold pattern)</span>
+<span class="op">Replace every method with the fold pattern:
+
+  Future<void> fetch{{FEATURE_NAME}}s() async {
+    emit({{FEATURE_NAME}}Loading());
+    final result = await _repo.get{{FEATURE_NAME}}s();
+    result.fold(
+      onSuccess: (data) => emit({{FEATURE_NAME}}Success(data)),
+      onFailure: (failure) => emit({{FEATURE_NAME}}Error(failure.userMessage(context))),
+    );
+  }
+
+For mutations (create/update/delete):
+  emit({{FEATURE_NAME}}ActionLoading());
+  result.fold(
+    onSuccess: (_) {
+      emit({{FEATURE_NAME}}ActionSuccess());
+      fetch{{FEATURE_NAME}}s(); // refresh list
+    },
+    onFailure: (f) => emit({{FEATURE_NAME}}ActionError(f.userMessage(context))),
+  );</span>
+
+<span class="sec">### Step 6 — Pagination (if {{HAS_PAGINATION}} = true)</span>
+<span class="op">Add to Success state:
+  - currentPage: int
+  - hasMore: bool
+  - items: List<Model>
+
+Add to Cubit:
+  - fetchNextPage() → append to existing list, increment page
+  - refresh() → reset page to 1, replace list
+  - Detect end: if response.length < pageSize → hasMore = false
+
+In Section:
+  - Listen to scroll via ScrollController
+  - Call cubit.fetchNextPage() when near bottom
+  - Use BlocSelector to watch hasMore separately from list</span>
+
+<span class="sec">### Step 7 — Auth Token Check (if {{AUTH_REQUIRED}} = true)</span>
+<span class="op">Verify in lib/core/network/interceptors/:
+- Token is attached from SecureStorage in the Dio interceptor
+- On 401 → AuthFailure is thrown → triggers session logout
+- Do NOT attach token manually in data source</span>
+
+<span class="sec">### Step 8 — Verify UI States in Sections</span>
+<span class="op">Confirm each section handles:
+- Loading → shimmer widget (BlocBuilder with buildWhen)
+- Error   → existing error widget + retry button that calls cubit method
+- Empty   → existing empty state widget  
+- Success → renders real data from state
+- No hardcoded strings → all via context.l10n</span>
+
+<span class="sec">### Deliverables</span>
+<span class="var">1. Audit report [APPROVAL NEEDED]</span>
+<span class="var">2. Updated remote data source</span>
+<span class="var">3. Updated repository (if violations existed)</span>
+<span class="var">4. Updated cubit with fold pattern</span>
+<span class="var">5. Summary: endpoints wired, states covered, violations fixed</span></pre></div>
+    </div>
+
+    <div class="vt">
+      <div class="vt-title">🔧 المتغيرات</div>
+      <div class="vr"><span class="vr-k">{{FEATURE_NAME}}</span><span class="vr-v">PascalCase · مثال: ProductCatalog</span></div>
+      <div class="vr"><span class="vr-k">{{FEATURE_FOLDER}}</span><span class="vr-v">snake_case · مثال: product_catalog</span></div>
+      <div class="vr"><span class="vr-k">{{ENDPOINT_LIST}}</span><span class="vr-v">مثال: GET /products, GET /products/:id, POST /cart/add</span></div>
+      <div class="vr"><span class="vr-k">{{AUTH_REQUIRED}}</span><span class="vr-v">true / false</span></div>
+      <div class="vr"><span class="vr-k">{{HAS_PAGINATION}}</span><span class="vr-v">true / false</span></div>
+      <div class="vr"><span class="vr-k">{{HAS_CACHE}}</span><span class="vr-v">true / false</span></div>
+    </div>
+  </section>
+
+  <hr class="div">
+
+  <!-- ══════ ARCH CHEATSHEET ══════ -->
+  <section class="ps" id="arch">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(59,130,246,.1);">🏛️</div>
+      <div class="ps-head-text">
+        <h2>Architecture Cheatsheet</h2>
+        <p>مرجع سريع للمعمارية — View · Section · Widget</p>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:12px 0;">
+
+      <div style="background:rgba(34,197,94,.06);border:1px solid rgba(34,197,94,.18);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:700;color:#86efac;margin-bottom:10px;">🖼️ Widget</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          ✅ Pure UI<br>
+          ✅ const constructor<br>
+          ✅ All data via params<br>
+          ✅ AppColors / AppSpacing<br>
+          ✅ context.l10n strings<br>
+          ⛔ No cubit access<br>
+          ⛔ No context.read<br>
+          ⛔ No business logic<br>
+          ⛔ No _buildXxx()
+        </div>
+      </div>
+
+      <div style="background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:700;color:#fde047;margin-bottom:10px;">🔧 Section</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          ✅ Logic bridge only<br>
+          ✅ context.read&lt;Cubit&gt;()<br>
+          ✅ BlocBuilder + buildWhen<br>
+          ✅ BlocSelector (single field)<br>
+          ✅ Pass min fields to widgets<br>
+          ⛔ No styling / decoration<br>
+          ⛔ No Container colors<br>
+          ⛔ No TextStyle inline
+        </div>
+      </div>
+
+      <div style="background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.18);border-radius:10px;padding:16px;">
+        <div style="font-size:13px;font-weight:700;color:#a5b4fc;margin-bottom:10px;">📱 View</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          ✅ Combines sections only<br>
+          ✅ BlocProvider wrapping<br>
+          ✅ AppBar widget<br>
+          ✅ Clean Scaffold<br>
+          ⛔ No BlocBuilder<br>
+          ⛔ No direct logic<br>
+          ⛔ No styling<br>
+          ⛔ No cubit.method() calls
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--s1);border:1px solid var(--border2);border-radius:10px;padding:16px 20px;margin-top:14px;font-size:12.5px;">
+      <div style="font-weight:700;color:var(--teal);margin-bottom:10px;font-size:11px;text-transform:uppercase;letter-spacing:1px;">ApiResult Fold Pattern — الوحيد المسموح</div>
+      <div class="arch" style="margin:0;">
+result.fold(
+  onSuccess: (data) => emit(<span class="hl">{{Feature}}Success</span>(data)),
+  onFailure: (f)    => emit(<span class="bad">{{Feature}}Error</span>(f.userMessage(context))),
+);</div>
+    </div>
+  </section>
+
+  <!-- ══════ FORBIDDEN ══════ -->
+  <section class="ps" id="forbidden">
+    <div class="ps-head">
+      <div class="ps-icon" style="background:rgba(239,68,68,.1);">🚫</div>
+      <div class="ps-head-text">
+        <h2>Forbidden Practices</h2>
+        <p>لو الـ agent عمل أي حاجة من دول، قفله فوراً وقوله يصحح</p>
+      </div>
+    </div>
+
+    <div class="rule-chips">
+      <div class="chip chip-red">UI logic في View</div>
+      <div class="chip chip-red">Styling في Section</div>
+      <div class="chip chip-red">Cubit access في Widget</div>
+      <div class="chip chip-red">_buildXxx() helper methods</div>
+      <div class="chip chip-red">Hardcoded colors / HEX</div>
+      <div class="chip chip-red">Hardcoded strings (بدون l10n)</div>
+      <div class="chip chip-red">API calls في Repository</div>
+      <div class="chip chip-red">try/catch في Cubit</div>
+      <div class="chip chip-red">Dio مباشرة في DataSource</div>
+      <div class="chip chip-red">BlocBuilder بدون buildWhen</div>
+      <div class="chip chip-red">Full State object للـ Widget</div>
+      <div class="chip chip-red">ListView بدون .builder</div>
+      <div class="chip chip-red">Opacity widget</div>
+      <div class="chip chip-red">ClipRRect جوه Lists</div>
+      <div class="chip chip-red">print() للـ logging</div>
+      <div class="chip chip-red">ملف أكبر من 200 سطر</div>
+    </div>
+
+    <div class="note n-rule" style="margin-top: 16px;">
+      <span class="n-icon">🔴</span>
+      <div>
+        لو الـ agent خالف rule، قوله بالظبط:<br>
+        <code style="font-family:var(--mono);">"You put styling inside a Section. This violates rule #3. Remove all decoration/color/style from that section and move it to the widget. Fix only this."</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;padding:36px 0 16px;color:var(--dim);font-size:12px;border-top:1px solid var(--border);">
+    <p>Flutter AI Prompt Guide — Customized for View · Section · Widget Architecture</p>
+    <p style="margin-top:5px;">Cubit · GetIt · ApiResult · GoRouter · Figma MCP</p>
+  </div>
+
+</main>
+</div>
+
+<script>
+  function cp(btn, id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    navigator.clipboard.writeText(el.innerText).then(() => {
+      btn.classList.add('ok');
+      btn.innerHTML = '✅ Copied!';
+      setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = '📋 Copy'; }, 2200);
+    });
+  }
+
+  // sidebar active link
+  const secs = document.querySelectorAll('.ps');
+  const links = document.querySelectorAll('.sb-link');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + e.target.id));
+      }
+    });
+  }, { threshold: 0.25 });
+  secs.forEach(s => io.observe(s));
+</script>
+</body>
+</html>
